@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ansible Windows Packet Flow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f8fafc; font-family: sans-serif; }
+        .flow-label { font-size: 10px; font-weight: 700; }
+        .node-title { font-size: 14px; font-weight: 800; }
+        .table-text { font-size: 11px; }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center min-h-screen">
+    <div class="max-w-7xl w-full bg-white rounded-xl shadow-xl p-6 border border-slate-200">
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-bold text-slate-800">Ansible-Windows Domain Packet Flow</h2>
+            <p class="text-slate-500 text-sm font-medium uppercase tracking-widest">Network Communication & Port Architecture</p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Left Sidebar: Port Matrix -->
+            <div class="w-full lg:w-1/3 border border-slate-100 rounded-lg overflow-hidden flex flex-col">
+                <div class="bg-slate-800 px-3 py-2">
+                    <h3 class="text-white text-xs font-bold uppercase tracking-wider">Firewall Port Matrix</h3>
+                </div>
+                <div class="overflow-x-auto flex-grow">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200">
+                                <th class="px-2 py-2 text-left text-[10px] font-bold text-slate-500 uppercase">Src > Dst</th>
+                                <th class="px-2 py-2 text-left text-[10px] font-bold text-slate-500 uppercase">Port</th>
+                                <th class="px-2 py-2 text-left text-[10px] font-bold text-slate-500 uppercase">Protocol</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <!-- Controller to DC -->
+                            <tr class="bg-amber-50/30">
+                                <td class="px-2 py-2 table-text font-semibold">CTL > DC</td>
+                                <td class="px-2 py-2 table-text">88, 53, 123</td>
+                                <td class="px-2 py-2 table-text">TCP/UDP</td>
+                            </tr>
+                            <!-- Controller to Targets -->
+                            <tr class="bg-indigo-50/30">
+                                <td class="px-2 py-2 table-text font-semibold">CTL > HOSTS</td>
+                                <td class="px-2 py-2 table-text">5986</td>
+                                <td class="px-2 py-2 table-text">TCP</td>
+                            </tr>
+                            <!-- Targets to DC -->
+                            <tr class="bg-sky-50/30">
+                                <td class="px-2 py-2 table-text font-semibold">HOSTS > DC</td>
+                                <td class="px-2 py-2 table-text">88, 53, 123</td>
+                                <td class="px-2 py-2 table-text">TCP/UDP</td>
+                            </tr>
+                            <tr class="bg-sky-50/30">
+                                <td class="px-2 py-2 table-text font-semibold">HOSTS > DC</td>
+                                <td class="px-2 py-2 table-text">389, 445</td>
+                                <td class="px-2 py-2 table-text">TCP</td>
+                            </tr>
+                            <tr class="bg-sky-50/30">
+                                <td class="px-2 py-2 table-text font-semibold">HOSTS > DC</td>
+                                <td class="px-2 py-2 table-text">135, 443</td>
+                                <td class="px-2 py-2 table-text">TCP</td>
+                            </tr>
+                             <tr class="bg-sky-50/30">
+                                <td class="px-2 py-2 table-text font-semibold">HOSTS > DC</td>
+                                <td class="px-2 py-2 table-text">Dynamic</td>
+                                <td class="px-2 py-2 table-text">TCP</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 bg-slate-50 mt-auto border-t border-slate-100">
+                    <p class="text-[10px] text-slate-400 italic font-medium">CTL: Linux Ansible Controller</p>
+                    <p class="text-[10px] text-slate-400 italic font-medium">DC: Domain Controller</p>
+                </div>
+            </div>
+
+            <!-- Right Side: SVG Diagram -->
+            <div class="w-full lg:w-2/3">
+                <div class="relative bg-slate-50/50 rounded-lg p-2">
+                    <svg viewBox="0 0 1000 650" class="w-full h-auto">
+                        <!-- Definitions for Markers -->
+                        <defs>
+                            <marker id="arrow-indigo" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#4f46e5" />
+                            </marker>
+                            <marker id="arrow-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#d97706" />
+                            </marker>
+                            <marker id="arrow-sky" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#0ea5e9" />
+                            </marker>
+                        </defs>
+
+                        <!-- --- ENTITIES --- -->
+
+                        <!-- Ansible Controller -->
+                        <g transform="translate(50, 250)">
+                            <rect width="220" height="150" rx="12" fill="#4f46e5" />
+                            <text x="110" y="35" text-anchor="middle" fill="white" class="node-title">Ansible Controller</text>
+                            <text x="110" y="55" text-anchor="middle" fill="white" font-size="11" opacity="0.8">Linux Ansible Controller</text>
+                            <rect x="20" y="75" width="180" height="55" rx="6" fill="white" fill-opacity="0.1" />
+                            <text x="35" y="95" fill="white" font-size="10" font-weight="bold">Identity: scan_svc</text>
+                            <text x="35" y="115" fill="white" font-size="10" font-weight="bold">Transport: WinRM/Kerberos</text>
+                        </g>
+
+                        <!-- Domain Controller (DC/DNS/NTP/CS) -->
+                        <g transform="translate(390, 20)">
+                            <rect width="220" height="180" rx="12" fill="#0f172a" />
+                            <text x="110" y="35" text-anchor="middle" fill="white" class="node-title">Domain Controller</text>
+                            <text x="110" y="55" text-anchor="middle" fill="#94a3b8" font-size="11">KDC / AD DS / DNS / CS</text>
+                            <line x1="20" y1="70" x2="200" y2="70" stroke="#334155" stroke-width="1" />
+                            <text x="30" y="95" fill="#fbbf24" font-size="10" font-weight="bold">Auth: Port 88, 464</text>
+                            <text x="30" y="115" fill="#38bdf8" font-size="10" font-weight="bold">Infra: Port 53, 123</text>
+                            <text x="30" y="135" fill="#38bdf8" font-size="10" font-weight="bold">LDAP/SMB: 389, 445</text>
+                            <text x="30" y="155" fill="#38bdf8" font-size="10" font-weight="bold">Enroll: 135, 443</text>
+                        </g>
+
+                        <!-- Target Windows Hosts -->
+                        <g transform="translate(730, 80)">
+                            <rect width="220" height="100" rx="12" fill="white" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="110" y="35" text-anchor="middle" fill="#1e293b" font-weight="bold" font-size="14">Windows Host 01</text>
+                            <rect x="30" y="55" width="160" height="25" rx="4" fill="#dcfce7" />
+                            <text x="110" y="72" text-anchor="middle" fill="#166534" font-size="10" font-weight="bold">Listening: 5986</text>
+                        </g>
+
+                        <g transform="translate(730, 250)">
+                            <rect width="220" height="100" rx="12" fill="white" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="110" y="35" text-anchor="middle" fill="#1e293b" font-weight="bold" font-size="14">Windows Host 02</text>
+                            <rect x="30" y="55" width="160" height="25" rx="4" fill="#dcfce7" />
+                            <text x="110" y="72" text-anchor="middle" fill="#166534" font-size="10" font-weight="bold">Listening: 5986</text>
+                        </g>
+
+                        <g transform="translate(730, 420)">
+                            <rect width="220" height="100" rx="12" fill="white" stroke="#cbd5e1" stroke-width="2" />
+                            <text x="110" y="35" text-anchor="middle" fill="#1e293b" font-weight="bold" font-size="14">Windows Host 03</text>
+                            <rect x="30" y="55" width="160" height="25" rx="4" fill="#dcfce7" />
+                            <text x="110" y="72" text-anchor="middle" fill="#166534" font-size="10" font-weight="bold">Listening: 5986</text>
+                        </g>
+
+                        <!-- --- FLOW ARROWS --- -->
+
+                        <!-- 1. Controller to DC -->
+                        <path d="M 160 250 Q 160 110 390 110" fill="none" stroke="#d97706" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow-amber)" />
+                        <rect x="110" y="140" width="140" height="45" rx="4" fill="white" stroke="#d97706" />
+                        <text x="180" y="158" text-anchor="middle" fill="#92400e" class="flow-label">KERBEROS TGT / DNS</text>
+                        <text x="180" y="172" text-anchor="middle" fill="#d97706" font-size="9">UDP 88, 53, 123</text>
+
+                        <!-- 2. Targets to DC -->
+                        <path d="M 730 110 L 610 110" fill="none" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrow-sky)" />
+                        <path d="M 730 280 L 610 180" fill="none" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrow-sky)" />
+                        <path d="M 730 450 L 610 200" fill="none" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrow-sky)" />
+                        <text x="560" y="240" fill="#0369a1" class="flow-label" text-anchor="middle">GPO / CERT ENROLL</text>
+                        <text x="560" y="255" fill="#0ea5e9" font-size="9" text-anchor="middle">389, 445, 135, 443, Dynamic</text>
+
+                        <!-- 3. Controller to Targets (Automation) -->
+                        <path d="M 270 290 L 730 160" fill="none" stroke="#4f46e5" stroke-width="3" opacity="0.6" marker-end="url(#arrow-indigo)" />
+                        <path d="M 270 325 L 730 300" fill="none" stroke="#4f46e5" stroke-width="3" opacity="0.6" marker-end="url(#arrow-indigo)" />
+                        <path d="M 270 360 L 730 440" fill="none" stroke="#4f46e5" stroke-width="3" opacity="0.6" marker-end="url(#arrow-indigo)" />
+                        
+                        <rect x="380" y="320" width="160" height="40" rx="6" fill="#4f46e5" />
+                        <text x="460" y="340" text-anchor="middle" fill="white" font-size="12" font-weight="bold">HTTPS WINRM</text>
+                        <text x="460" y="353" text-anchor="middle" fill="#c7d2fe" font-size="10">TCP PORT 5986</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Port Legend -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-slate-100 pt-6">
+            <div class="p-3 rounded-lg bg-amber-50 border border-amber-100">
+                <h4 class="text-amber-800 font-bold text-[10px] uppercase mb-1">Identity Flow</h4>
+                <p class="text-[10px] text-amber-700 leading-tight">Ansible requests tickets from KDC. Requires <strong>88, 53, 123</strong> to be open from Controller to DC.</p>
+            </div>
+            <div class="p-3 rounded-lg bg-sky-50 border border-sky-100">
+                <h4 class="text-sky-800 font-bold text-[10px] uppercase mb-1">Hardening Flow</h4>
+                <p class="text-[10px] text-sky-700 leading-tight">Targets pull GPO and Certs. Requires <strong>389, 445, 135, 443</strong> from Targets to DC.</p>
+            </div>
+            <div class="p-3 rounded-lg bg-indigo-50 border border-indigo-100">
+                <h4 class="text-indigo-800 font-bold text-[10px] uppercase mb-1">Management Flow</h4>
+                <p class="text-[10px] text-indigo-700 leading-tight">Encrypted automation commands. Requires <strong>5986</strong> from Controller to all Targets.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
